@@ -906,36 +906,36 @@ The convergence in the theorem is illustrated in the next figure
 
 .. code-block:: ipython
 
-  P = ((0.971, 0.029, 0.000),
-       (0.145, 0.778, 0.077),
-       (0.000, 0.508, 0.492))
-  P = np.array(P)
+import cufflinks as cf
+' Creat Markov chains'
+P = ((0.971, 0.029, 0.000),
+     (0.145, 0.778, 0.077),
+     (0.000, 0.508, 0.492))
+P = np.array(P) # 转化为numpy矩阵
 
-  ψ = (0.0, 0.2, 0.8)        # Initial condition
+'Initial condition'
+ψ_0 = (0.0, 0.2, 0.8)  
+ψ = np.array(ψ_0)
 
-  fig = plt.figure(figsize=(8, 6))
-  ax = fig.add_subplot(111, projection='3d')
+'Defining matrix shape'
+C = 20   # Define the number of matrix columns
+R = 3    # Define the number of matrix rows
 
-  ax.set(xlim=(0, 1), ylim=(0, 1), zlim=(0, 1),
-         xticks=(0.25, 0.5, 0.75),
-         yticks=(0.25, 0.5, 0.75),
-         zticks=(0.25, 0.5, 0.75))
+'Substituting matrix'
+xyz = np.ones((R, C))  # Matrix initialization
+for t in range(C):
+    xyz[:,t] = ψ[:]   # The result of the calculation is directly assigned to the column
+    ψ = ψ @ P
 
-  x_vals, y_vals, z_vals = [], [], []
-  for t in range(20):
-      x_vals.append(ψ[0])
-      y_vals.append(ψ[1])
-      z_vals.append(ψ[2])
-      ψ = ψ @ P
+'Initial point coordinates '
+mc = qe.MarkovChain(P)
+ψ_star = mc.stationary_distributions[0]
 
-  ax.scatter(x_vals, y_vals, z_vals, c='r', s=60)
-  ax.view_init(30, 210)
+df = pd.DataFrame(xyz.T,columns=['x', 'y', 'z'])
 
-  mc = qe.MarkovChain(P)
-  ψ_star = mc.stationary_distributions[0]
-  ax.scatter(ψ_star[0], ψ_star[1], ψ_star[2], c='k', s=60)
-
-  plt.show()
+df.iplot(kind='scatter3d',x='x',y='y',z='z',size=15,
+                             title='Cufflinks - Scatter 3D Chart',colors=['blue'],width=0.5,margin=(0,0,0,0),
+                             opacity=1)
 
 
 
